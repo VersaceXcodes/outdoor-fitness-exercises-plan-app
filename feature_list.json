@@ -1,0 +1,18 @@
+[
+  {
+    "id": "preset-workout-plans",
+    "category": "functional",
+    "description": "Provide pre-built workout plans for different fitness levels and goals",
+    "steps": [
+      "Navigate to preset plans section",
+      "Browse available preset plans",
+      "Select a plan matching fitness level",
+      "Preview plan exercises and structure",
+      "Start workout from preset plan"
+    ],
+    "priority": 2,
+    "passes": true,
+    "selected": true,
+    "order": 11
+  }
+]

@@ -25,6 +25,12 @@ const UV_Dashboard: React.FC = () => {
               </div>
               <div className="flex items-center space-x-4">
                 <Link 
+                  to="/preset-plans"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Preset Plans
+                </Link>
+                <Link 
                   to="/profile"
                   className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >

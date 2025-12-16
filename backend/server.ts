@@ -12,6 +12,7 @@ import bcrypt from 'bcryptjs';
 dotenv.config();
 
 const { DATABASE_URL, PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGPORT = 5432 } = process.env;
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key_change_me';
 
 const pool = new Pool(
   DATABASE_URL
@@ -268,6 +269,51 @@ app.get('/api/protected', authenticate_token, (req, res) => {
     },
     timestamp: new Date().toISOString()
   });
+});
+
+// Get all workout plans
+app.get('/api/workout-plans', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM workout_plans ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching workout plans:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get a single workout plan with exercises
+app.get('/api/workout-plans/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Fetch plan details
+    const planResult = await pool.query('SELECT * FROM workout_plans WHERE id = $1', [id]);
+    
+    if (planResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Workout plan not found' });
+    }
+    
+    const plan = planResult.rows[0];
+    
+    // Fetch exercises for this plan
+    const exercisesResult = await pool.query(`
+      SELECT 
+        e.id, e.name, e.description, e.category, e.video_url,
+        wpe.sets, wpe.reps, wpe.duration_seconds, wpe.order_index
+      FROM workout_plan_exercises wpe
+      JOIN exercises e ON wpe.exercise_id = e.id
+      WHERE wpe.workout_plan_id = $1
+      ORDER BY wpe.order_index ASC
+    `, [id]);
+    
+    plan.exercises = exercisesResult.rows;
+    
+    res.json(plan);
+  } catch (error) {
+    console.error('Error fetching workout plan details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 app.get("/", (req, res) => {
